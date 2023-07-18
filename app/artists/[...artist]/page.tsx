@@ -8,7 +8,7 @@ import {
   FaTiktok,
   FaYoutube,
 } from "react-icons/fa";
-import Typewriter from "@/Typewriter/Typewriter";
+// import Typewriter from "@/Typewriter/Typewriter";
 import { artists, Artist, Props } from "../page";
 
 const ArtistPage: React.FC<Props> = ({ params }) => {
@@ -18,7 +18,7 @@ const ArtistPage: React.FC<Props> = ({ params }) => {
   return (
     <>
       <div className="flex justify-center mt-[10px] font-bold ">
-        <Typewriter text={artist?.name ?? ""} />
+        {/* <Typewriter text={artist?.name ?? ""} /> */}
       </div>
       <div className="bio-container grid gap-4 mb-[10%]">
         <div className="flex flex-col items-center justify-evenly relative w-full overflow-hidden h-[400px] img-container">
