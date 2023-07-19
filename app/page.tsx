@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { storage } from "../../../firebase/config";
+import { storage } from "../firebase/config";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
