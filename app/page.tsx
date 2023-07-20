@@ -6,61 +6,51 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 function Page() {
-  const [file, setFile] = useState<File | undefined>();
-  const [percent, setPercent] = useState(0);
-  const [downloadURL, setDownloadURL] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [percent, setPercent] = useState<number>(0);
 
-  function handleUpload() {
-    if (file) {
-      const name = file.name;
-      const storageRef = ref(storage, `image/${name}+${uuidv4()}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+  // Handle file upload event and update state
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.files && event.target.files.length > 0) {
+      setFile(event.target.files[0]);
+    }
+  }
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const percent = Math.floor(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-
-          setPercent(percent); // to show progress upload
-
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            // url is the download URL of the file
-            console.log(url);
-            setDownloadURL(url);
-          });
-        }
-      );
+  const handleUpload = () => {
+    if (!file) {
+      alert("Please upload an image first!");
       return;
     }
-    console.log("Please select a file");
-  }
+
+    const storageRef = ref(storage, `/files/${file.name} ${uuidv4()}`);
+    console.log(storageRef);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const percent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+
+        // update progress
+        setPercent(percent);
+      },
+      (err) => console.log(err),
+      () => {
+        // download url
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log(url);
+        });
+      }
+    );
+  };
 
   return (
     <div>
-      <input
-        type="file"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setFile(e.target.files![0])
-        }
-        accept=""
-      />
+      <input type="file" onChange={handleChange} accept="image/*" />
       <button onClick={handleUpload}>Upload to Firebase</button>
-      <p>{percent}% done</p>
+      <p>{percent} done</p>
     </div>
   );
 }
